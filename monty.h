@@ -38,4 +38,5 @@ void pall(stack_t *stack);
 void free_stack(stack_t *stack);
 int read_instruction(FILE *file, char *opcode, int *value);
 void process_instruction(stack_t **stack, const char *opcode, int value);
+void pint(stack_t *stack);
 #endif
