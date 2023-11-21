@@ -1,109 +1,99 @@
 #include "monty.h"
 /**
- * push - Pushes an element onto the stack
- * @stack: Pointer to the top of the stack
- * @value: Value to be pushed onto the stack
- *
- * Return: None
+ * _push - push int to a stack
+ * @stack: linked lists for monty stack
+ * @line_number: number of line opcode occurs on
  */
-void push(stack_t **stack, int value)
+void _push(stack_t **stack, __attribute__ ((unused))unsigned int line_number)
 {
-	stack_t *new_node;
+	stack_t *top;
+	(void)line_number;
 
-	new_node = malloc(sizeof(stack_t));
-	if (!new_node)
+	top = malloc(sizeof(stack_t));
+	if (top == NULL)
 	{
-		fprintf(stderr, "Memory allocation error\n");
+		fprintf(stderr, "Error: malloc failed\n");
 		exit(EXIT_FAILURE);
 	}
-	new_node->n = value;
-	new_node->prev = NULL;
-	new_node->next = *stack;
+
+	top->n = var_global.push_arg;
+	top->next = *stack;
+	top->prev = NULL;
 	if (*stack != NULL)
-	{
-		(*stack)->prev = new_node;
-	}
-	*stack = new_node;
+		(*stack)->prev = top;
+	*stack = top;
 }
 
 /**
- * pall - Prints all the values on the stack
- * @stack: Pointer to the top of the stack
- *
- * Return: None
+ * _pall - print all function
+ * @stack: pointer to linked list stack
+ * @line_number: number of line opcode occurs on
  */
-void pall(stack_t *stack)
+void _pall(stack_t **stack, __attribute__ ((unused))unsigned int line_number)
 {
-	while (stack != NULL)
+	stack_t *runner;
+
+	runner = *stack;
+	while (runner != NULL)
 	{
-		printf("%d\n", stack->n);
-		stack = stack->next;
+		printf("%d\n", runner->n);
+		runner = runner->next;
 	}
 }
 
 /**
- * free_stack - Frees the memory allocated for the stack
- * @stack: Pointer to the top of the stack
+ * _pint - print int a top of stack
+ * @stack: pointer to linked list stack
+ * @line_number: number of line opcode occurs on
  *
- * Return: None
  */
-void free_stack(stack_t *stack)
+void _pint(stack_t **stack, unsigned int line_number)
 {
-	while (stack != NULL)
-	{
-		stack_t *temp = stack;
+	stack_t *runner;
 
-		stack = stack->next;
-		free(temp);
-	}
-}
-/**
- * read_instruction - Reads an instruction from a file
- * @file: Pointer to the file
- * @opcode: Buffer to store the opcode
- * @value: Pointer to store the value (for push opcode)
- *
- * Return: 1 if an instruction is successfully read, 0 if end of file
- */
-int read_instruction(FILE *file, char *opcode, int *value)
-{
-	if (fscanf(file, "%s", opcode) == EOF)
+	runner = *stack;
+	if (runner == NULL)
 	{
-		return (0);
-	}
-	if (strcmp(opcode, "push") == 0)
-	{
-		if (fscanf(file, "%d", value) != 1)
-		{
-			fprintf(stderr, "Error: usage: push integer\n");
-			exit(EXIT_FAILURE);
-		}
-	}
-	return (1);
-}
-
-/**
- * process_instruction - Processes an instruction and performs the
- * corresponding operation
- * @stack: Pointer to the top of the stack
- * @opcode: Opcode to be processed
- * @value: Value associated with the opcode (for push opcode)
- *
- * Return: None
- */
-void process_instruction(stack_t **stack, const char *opcode, int value)
-{
-	if (strcmp(opcode, "push") == 0)
-	{
-		push(stack, value);
-	}
-	else if (strcmp(opcode, "pall") == 0)
-	{
-		pall(*stack);
-	}
-	else
-	{
-		fprintf(stderr, "Unknown opcode: %s\n", opcode);
+		fprintf(stderr, "L%d: can't pint, stack empty\n", line_number);
 		exit(EXIT_FAILURE);
+	}
+	printf("%d\n", runner->n);
+}
+
+/**
+ * _pop - remove element a list
+ *@stack: pointer to first node
+ *@line_number: integer
+ *Return: void
+ */
+void _pop(stack_t **stack, unsigned int line_number)
+{
+	stack_t *nodo = *stack;
+
+	if (stack == NULL || *stack == NULL)
+	{
+		fprintf(stderr, "L%d: can't pop an empty stack\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	*stack = nodo->next;
+	if (*stack != NULL)
+		(*stack)->prev = NULL;
+	free(nodo);
+}
+
+/**
+ * free_dlistint - free a list
+ * @head: pointer to first node
+ *
+ */
+void free_dlistint(stack_t *head)
+{
+	stack_t *tmp;
+
+	while (head != NULL)
+	{
+		tmp = head->next;
+		free(head);
+		head = tmp;
 	}
 }
